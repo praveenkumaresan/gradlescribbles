@@ -1,0 +1,159 @@
+task hello{
+    doLast {
+        println("hello praveen")
+    }
+}
+
+//Gradle’s build scripts give you the full power of Groovy and Kotlin. As an appetizer, have a look at this
+task upper{
+    doLast {
+        def something = "Praveen"
+        println("Original : $something")
+        println("Converted to uppercase : ${something.toUpperCase()}")
+    }
+}
+
+task count {
+    doLast {
+        5.times {print "$it "}
+        4.times { print "$it " }
+    }
+}
+
+
+//As you probably have guessed, you can declare tasks that depend on other tasks.
+
+task last{
+    doLast {
+        print("i am in hello2")
+    }
+}
+
+task dependhello{
+    dependsOn last
+    doLast {
+        println("i am in hello")
+    }
+}
+
+
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+
+//Dynamic tasks
+
+4.times { counter ->
+    task "task$counter" {
+        doLast {
+            println "I'm task number $counter"
+        }
+    }
+}
+
+
+//Manipulating existing tasks
+//Output is
+// I am task1 number 2
+// I am task1 number 3
+// I am task1 number 0
+
+4.times { counter ->
+    task "task1$counter" {
+        doLast {
+            println (" I am task1 number $counter")
+        }
+    }
+}
+
+task10.dependsOn task12, task13
+
+//Manipulating existing tasks different example
+//The calls doFirst and doLast can be executed multiple times. They add an action to the beginning or the end of the task’s actions list.
+// When the task executes, the actions in the action list are executed in order.
+
+
+task helloplanet {
+    doLast {
+        println 'Hello Earth'
+    }
+}
+helloplanet.doFirst {
+    println 'Hello Venus'
+}
+helloplanet.configure {
+    doLast {
+        println 'Hello Mars'
+    }
+}
+helloplanet.configure {
+    doLast {
+        println 'Hello Jupiter'
+    }
+}
+
+
+//Groovy DSL shortcut notations
+//There is a convenient notation for accessing an existing task. Each task is available as a property of the build script:
+
+task helloproperty {
+    doLast {
+        println 'Hello world!'
+    }
+}
+hello.doLast {
+    println "Greetings from the $helloproperty.name task."
+}
+
+
+
+
+//extra task properties
+
+task myTask {
+    ext.myProperty = "myValue"
+}
+
+task printTaskProperties {
+    doLast {
+        println myTask.myProperty
+    }
+}
+
+
+apply plugin: 'kotlin'
+apply plugin: 'application'
+
+group 'com.kpk.scribbles'
+version '1.0.0'
+mainClassName = "io.ktor.server.netty.EngineMain"
+
+sourceSets {
+    main.kotlin.srcDirs = main.java.srcDirs = ['src']
+    test.kotlin.srcDirs = test.java.srcDirs = ['test']
+    main.resources.srcDirs = ['resources']
+    test.resources.srcDirs = ['testresources']
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+    maven { url 'https://kotlin.bintray.com/ktor' }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "io.ktor:ktor-server-netty:$ktor_version"
+    implementation "ch.qos.logback:logback-classic:$logback_version"
+    implementation "io.ktor:ktor-client-core:$ktor_version"
+    implementation "io.ktor:ktor-client-core-jvm:$ktor_version"
+    testImplementation "io.ktor:ktor-server-tests:$ktor_version"
+}
